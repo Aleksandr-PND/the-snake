@@ -1,16 +1,13 @@
 from random import choice, randint
 import pygame
 
-from gameparts import (APPLE_COLOR, BOARD_BACKGROUND_COLOR, BORDER_COLOR, DOWN,
-                       GRID_HEIGHT, GRID_SIZE, GRID_WIDTH, LEFT, RIGHT,
-                       SCREEN_WIDTH, SCREEN_HEIGHT, SNAKE_COLOR, UP)
-
+from gameparts import (APPLE_COLOR, BAD_APPLE_COLOR, BOARD_BACKGROUND_COLOR,
+                       BORDER_COLOR, DOWN, GRID_HEIGHT, GRID_SIZE, GRID_WIDTH,
+                       LEFT, RIGHT, SCREEN_WIDTH, SCREEN_HEIGHT, SNAKE_COLOR,
+                       UP)
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-
-# Заголовок окна игрового поля:
-pygame.display.set_caption('Змейка')
 
 # Настройка времени:
 clock = pygame.time.Clock()
@@ -51,6 +48,14 @@ class Apple(GameObject):
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
+class BadApple(Apple):
+    """Класс описывающий плохое яблоко на поле."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.body_color = BAD_APPLE_COLOR
+
+
 class Snake(GameObject):
     """Класс, описывающий змейку."""
 
@@ -62,6 +67,8 @@ class Snake(GameObject):
         self.direction = RIGHT
         self.next_direction = None
         self.last = None
+        self.take_bad_apple = False
+        self.max_length = 1
 
     def update_direction(self):
         """Метод обновления направления после нажатия на кнопку."""
@@ -74,7 +81,11 @@ class Snake(GameObject):
         self.new_head = self.get_head_position()
         self.last = self.positions[-1]
         self.positions.insert(0, self.new_head)
-        if len(self.positions) > self.length:
+        if self.take_bad_apple:
+            del self.positions[-2:]
+            self.last = self.positions[-1]
+            self.take_bad_apple = False
+        elif len(self.positions) > self.length:
             del self.positions[-1]
 
     def get_head_position(self):
