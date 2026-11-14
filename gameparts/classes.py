@@ -30,10 +30,11 @@ class Apple(GameObject):
 
     body_color: tuple[int, int, int]
 
-    def __init__(self) -> None:
+    def __init__(self, bitten: bool = False) -> None:
         super().__init__()
         self.position = self.randomize_position()
-        self.body_color = APPLE_COLOR
+        self.bitten = bitten
+        self.body_color = BAD_APPLE_COLOR if bitten else APPLE_COLOR
 
     def randomize_position(self):
         """Метод, генерирующий позицию яблока."""
@@ -41,19 +42,38 @@ class Apple(GameObject):
         self.positionY = (randint(0, GRID_HEIGHT - 1)) * GRID_SIZE
         return (self.positionX, self.positionY)
 
-    def draw(self):
+    def _draw_apple(self):
         """Метод, отрисовки яблока."""
-        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, self.body_color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+        x, y = self.position
+        cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
+        r = GRID_SIZE // 2 - 2
 
+        # Тело яблока — красный круг
+        pygame.draw.circle(screen, self.body_color, (cx, cy + 2), r)
+        pygame.draw.circle(screen, BORDER_COLOR, (cx, cy + 2), r, 1)
 
-class BadApple(Apple):
-    """Класс описывающий плохое яблоко на поле."""
+        # Черешок — коричневая линия
+        pygame.draw.line(screen, (101, 67, 33), (cx, cy - r + 2),
+                         (cx, cy - r - 3), 2)
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.body_color = BAD_APPLE_COLOR
+        # Листик — зелёный эллипс (или маленький круг)
+        pygame.draw.ellipse(
+            screen, (0, 180, 0),
+            pygame.Rect(cx + 1, cy - r - 2, 6, 4)
+        )
+
+    def draw(self):
+        """Метод, отрисовки  плохого яблока."""
+        self._draw_apple()
+        if self.bitten:
+            x, y = self.position
+            cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
+            # r = GRID_SIZE // 2 - 2
+            # bite_center = (cx + r - 2, cy + 2)
+            for dx, dy, r in [(-6, 0, 4), (2, -3, 3), (3, 3, 3)]:
+                c = (cx + r + dx, cy + 2 + dy)
+                pygame.draw.circle(screen, BOARD_BACKGROUND_COLOR, c, 6)
+                pygame.draw.circle(screen, BORDER_COLOR, c, 6, 1)
 
 
 class Snake(GameObject):
@@ -103,22 +123,28 @@ class Snake(GameObject):
         self.body_color = SNAKE_COLOR
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
-        sequence = (RIGHT, LEFT, UP, DOWN)
-        self.direction = choice(sequence)
+        self.direction = choice((RIGHT, LEFT, UP, DOWN))
         self.next_direction = None
         self.last = None
 
     def draw(self):
         """Метод отрисовки змейки и затирания последнего сегмента."""
         for position in self.positions[0:]:
-            rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
-            pygame.draw.rect(screen, self.body_color, rect)
-            pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+            center = (position[0] + GRID_SIZE // 2,
+                      position[1] + GRID_SIZE // 2)
+            pygame.draw.circle(screen, self.body_color, center,
+                               GRID_SIZE // 2 - 1)
+            pygame.draw.circle(screen, BORDER_COLOR, center,
+                               GRID_SIZE // 2 - 1, 1)
 
         # Отрисовка головы змейки
-        head_rect = pygame.Rect(self.positions[0], (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, self.body_color, head_rect)
-        pygame.draw.rect(screen, BORDER_COLOR, head_rect, 1)
+        x, y = self.positions[0]
+        # определяем центр клетки головы
+        cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
+        # Радиус -1 что бы не выходил за границы
+        r = GRID_SIZE // 2 - 1
+        pygame.draw.circle(screen, self.body_color, (cx, cy), r)
+        pygame.draw.circle(screen, BORDER_COLOR, (cx, cy), r, 1)
 
         # Затирание последнего сегмента
         if self.last:

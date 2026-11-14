@@ -1,6 +1,6 @@
 import pygame
 
-from gameparts import Apple, BadApple, Snake, clock, screen
+from gameparts import Apple, Snake, clock, screen
 from gameparts import BOARD_BACKGROUND_COLOR, DOWN, LEFT, RIGHT, UP, SPEED
 
 
@@ -32,14 +32,8 @@ def main():
     pygame.init()
     # Тут нужно создать экземпляры классов.
     apple = Apple()
-    bad_apple = BadApple()
+    bad_apple = Apple(True)
     snake = Snake()
-    positions_coincide = True
-    while positions_coincide:
-        if snake.position == bad_apple.position:
-            bad_apple = BadApple()
-        else:
-            break
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
@@ -52,7 +46,7 @@ def main():
                 pygame.display.set_caption('Змейка | Максимальная длина '
                                            f'змейки: {snake.max_length}')
             apple = Apple()
-            bad_apple = BadApple()
+            bad_apple = Apple(True)
         if snake.positions[0] in snake.positions[1:]:
             snake.reset()
         if snake.positions[0] == bad_apple.position and snake.length < 2:
@@ -60,7 +54,7 @@ def main():
         elif snake.positions[0] == bad_apple.position:
             snake.length -= 1
             snake.take_bad_apple = True
-            bad_apple = BadApple()
+            bad_apple = Apple(True)
         screen.fill(BOARD_BACKGROUND_COLOR)
         bad_apple.draw()
         apple.draw()
