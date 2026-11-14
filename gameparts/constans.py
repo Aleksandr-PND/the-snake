@@ -26,4 +26,4 @@ BAD_APPLE_COLOR = (0, 206, 209)
 SNAKE_COLOR = (0, 255, 0)
 
 # Скорость движения змейки:
-SPEED = 5
+SPEED = 3

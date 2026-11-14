@@ -51,6 +51,7 @@ def main():
             snake.reset()
         if snake.positions[0] == bad_apple.position and snake.length < 2:
             snake.reset()
+            bad_apple = Apple(True)
         elif snake.positions[0] == bad_apple.position:
             snake.length -= 1
             snake.take_bad_apple = True

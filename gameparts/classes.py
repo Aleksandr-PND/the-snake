@@ -68,8 +68,6 @@ class Apple(GameObject):
         if self.bitten:
             x, y = self.position
             cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
-            # r = GRID_SIZE // 2 - 2
-            # bite_center = (cx + r - 2, cy + 2)
             for dx, dy, r in [(-6, 0, 4), (2, -3, 3), (3, 3, 3)]:
                 c = (cx + r + dx, cy + 2 + dy)
                 pygame.draw.circle(screen, BOARD_BACKGROUND_COLOR, c, 6)
@@ -137,14 +135,17 @@ class Snake(GameObject):
             pygame.draw.circle(screen, BORDER_COLOR, center,
                                GRID_SIZE // 2 - 1, 1)
 
-        # Отрисовка головы змейки
-        x, y = self.positions[0]
-        # определяем центр клетки головы
-        cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
-        # Радиус -1 что бы не выходил за границы
-        r = GRID_SIZE // 2 - 1
-        pygame.draw.circle(screen, self.body_color, (cx, cy), r)
-        pygame.draw.circle(screen, BORDER_COLOR, (cx, cy), r, 1)
+        # Отрисовка головы змейки    
+        # x, y = self.positions[0]
+        # # определяем центр клетки головы
+        # cx, cy = x + GRID_SIZE // 2, y + GRID_SIZE // 2
+        # # Радиус -1 что бы не выходил за границы
+        # r = GRID_SIZE // 2 - 1
+        HEAD_IMG = pygame.image.load('snake_green_head.png')
+        HEAD_IMG = pygame.transform.scale(HEAD_IMG, (GRID_SIZE, GRID_SIZE))
+        screen.blit(HEAD_IMG, self.positions[0])
+        # pygame.draw.circle(screen, self.body_color, (cx, cy), r)
+        # pygame.draw.circle(screen, BORDER_COLOR, (cx, cy), r, 1)
 
         # Затирание последнего сегмента
         if self.last:
